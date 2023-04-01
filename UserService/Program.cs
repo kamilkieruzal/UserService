@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using UserService.Database;
 using UserService.Interfaces.Services;
 using UserService.Services;
 
@@ -8,10 +10,12 @@ builder.Services.AddCors(p => p.AddPolicy("corsapp", builder =>
     builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
 
-builder.Services.AddSingleton<IDbService, DbService>();
-builder.Services.AddSingleton<IValidationService, ValidationService>();
+builder.Services.AddTransient<IDbService, DbService>();
+builder.Services.AddTransient<IValidationService, ValidationService>();
 builder.Services.AddSingleton<IRandomUserService, RandomUserService>();
-builder.Services.AddControllers();
+builder.Services.AddDbContext<UserDbContext>(options => options.UseInMemoryDatabase("Users"));
+builder.Services.AddControllers().AddNewtonsoftJson(options => 
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

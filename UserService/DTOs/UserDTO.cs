@@ -4,8 +4,8 @@ namespace UserService.DTOs
 {
     public class UserDTO
     {
-        [StringLength(256, MinimumLength = 1, ErrorMessage = "Maximum 256 characters")]
-        public string Name { get; set; } = default!;
-        public int UserId { get; set; }
+        public int Id { get; set; }
+        [StringLength(256, MinimumLength = 0, ErrorMessage = "Maximum 256 characters")]
+        public string UserName { get; set; } = default!;
     }
 }

@@ -1,25 +1,27 @@
-﻿using UserService.Interfaces.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using UserService.Database;
+using UserService.Interfaces.Models;
 using UserService.Interfaces.Services;
 
 namespace UserService.Services
 {
     public class ValidationService : IValidationService
     {
-        public bool IsValid(UserModel userModel, IList<UserModel> database)
+        private const int NumberOfPossibleUserDataToday = 5;
+        private readonly UserDbContext userDbContext;
+
+        public ValidationService(UserDbContext userDbContext)
         {
-            if (database.Count(x => x.UserId == userModel.UserId) > 4)
-                return false;
-            return true;
+            this.userDbContext = userDbContext;
         }
 
-        public void DeactivateOldUsers(IList<UserModel> database)
+        public async Task<bool> IsUserDataValidAsync(UserDataModel userDataModel)
         {
-            var today = DateTime.Now.Date;
-
-            foreach (var user in database.Where(x => (today - x.CreatedDate) > TimeSpan.FromDays(4)))
-            {
-                user.Status = false;
-            }
+            if (await userDbContext.UserData
+                .Where(u => u.CreatedDate == DateTime.Today.Date)
+                .CountAsync(x => x.User.Id == userDataModel.UserId) >= NumberOfPossibleUserDataToday)
+                return false;
+            return true;
         }
     }
 }

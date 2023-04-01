@@ -4,7 +4,11 @@ namespace UserService.Interfaces.Services
 {
     public interface IDbService
     {
-        void AddNewUser(UserModel userModel);
-        IList<UserModel> UserDatabase { get; set; }
+        Task AddNewUserAsync(UserModel userModel);
+        Task AddNewUserDataAsync(UserDataModel userDataModel);
+        Task<IEnumerable<UserModel>> GetUsersAsync(UserParameters userParameters, string? userName = null);
+        Task<IEnumerable<UserDataModel>> GetUserDataAsync(UserParameters userParameters, string? userName = null);
+        Task PopulateDatabaseAsync();
+        Task DeactivateOldUserDataAsync();
     }
 }

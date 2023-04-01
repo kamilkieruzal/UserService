@@ -8,13 +8,21 @@ namespace UserService.MappingProfile
     {
         public MappingProfiles()
         {
-            CreateMap<UserDTO, UserModel>()
+            CreateMap<UserDataDTO, UserDataModel>()
                 .ForMember(dest => dest.UserId, dto => dto.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Name, dto => dto.MapFrom(src => src.Name));
 
-            CreateMap<UserModel, UserDTO>()
-                .ForMember(dest => dest.UserId, dto => dto.MapFrom(src => src.UserId))
+            CreateMap<UserDataModel, UserDataDTO>()
+                .ForMember(dest => dest.UserId, dto => dto.MapFrom(src => src.Id))
                 .ForMember(dest => dest.Name, dto => dto.MapFrom(src => src.Name));
+
+            CreateMap<UserDTO, UserModel>()
+                .ForMember(dest => dest.Id, dto => dto.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, dto => dto.MapFrom(src => src.UserName));
+
+            CreateMap<UserModel, UserDTO>()
+                .ForMember(dest => dest.Id, dto => dto.MapFrom(src => src.Id))
+                .ForMember(dest => dest.UserName, dto => dto.MapFrom(src => src.UserName));
         }
     }
 }

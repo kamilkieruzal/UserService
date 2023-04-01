@@ -8,35 +8,40 @@ namespace UserService.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UserDataController : ControllerBase
     {
         private readonly IMapper mapper;
         private readonly IDbService dbService;
+        private readonly IValidationService validationService;
         private readonly IRandomUserService randomUserService;
 
-        public UserController(IMapper mapper, IDbService dbService, IRandomUserService randomUserService)
+        public UserDataController(IMapper mapper, IDbService dbService, IValidationService validationService, IRandomUserService randomUserService)
         {
             this.mapper = mapper;
             this.dbService = dbService;
+            this.validationService = validationService;
             this.randomUserService = randomUserService;
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveUser([FromBody] UserDTO userDTO)
+        public async Task<IActionResult> SaveUserData([FromBody] UserDataDTO userDataDTO)
         {
             await dbService.DeactivateOldUserDataAsync(); //instead this in real db could be implemented as some db job running stored procedure
 
             try
             {
-                var user = mapper.Map<UserModel>(userDTO);
-                await dbService.AddNewUserAsync(user);
+                var userData = mapper.Map<UserDataModel>(userDataDTO);
+                if (!await validationService.IsUserDataValidAsync(userData))
+                    return BadRequest("Invalid user data");
+
+                await dbService.AddNewUserDataAsync(userData);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
 
-            return Ok("User record created");
+            return Ok("User data record created");
         }
 
         [HttpGet]
@@ -44,12 +49,11 @@ namespace UserService.Controllers
         {
             await dbService.DeactivateOldUserDataAsync(); //instead this in real db could be implemented as some db job running stored procedure
 
-            IEnumerable<UserDTO> result;
+            IEnumerable<UserDataModel> result;
 
             try
             {
-                var users = await dbService.GetUsersAsync(userParameters, userName);
-                result = mapper.Map<IEnumerable<UserDTO>>(users);
+                result = await dbService.GetUserDataAsync(userParameters, userName);
             }
             catch (Exception ex)
             {
@@ -59,20 +63,13 @@ namespace UserService.Controllers
             return Ok(result);
         }
 
-        [HttpGet("randomUser")]
-        public IActionResult CreateRandomUser()
+        [HttpGet("randomUserData")]
+        public IActionResult CreateRandomUserData([FromQuery] UserDTO user)
         {
-            var randomUser = mapper.Map<UserDTO>(randomUserService.GetRandomUser());
+            var userModel = mapper.Map<UserModel>(user);
+            var randomUserData = mapper.Map<UserDataDTO>(randomUserService.GetRandomUserData(userModel));
 
-            return Ok(randomUser);
-        }
-
-        [HttpPost("populateDb")]
-        public async Task<IActionResult> PopulateDatabase()
-        {
-            await dbService.PopulateDatabaseAsync();
-
-            return Ok();
+            return Ok(randomUserData);
         }
     }
 }
