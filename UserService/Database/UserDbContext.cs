@@ -5,6 +5,8 @@ namespace UserService.Database
 {
     public class UserDbContext : DbContext
     {
+        public UserDbContext() { } // only for tests
+
         public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
         {
         }
@@ -23,7 +25,7 @@ namespace UserService.Database
                 .HasForeignKey(d => d.UserId);
         }
 
-        public DbSet<UserModel> Users { get; set; }
-        public DbSet<UserDataModel> UserData { get; set; }
+        public virtual DbSet<UserModel> Users { get; set; }
+        public virtual DbSet<UserDataModel> UserData { get; set; }
     }
 }

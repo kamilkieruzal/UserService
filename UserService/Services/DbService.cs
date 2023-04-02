@@ -78,10 +78,12 @@ namespace UserService.Services
             await AddNewUserDataAsync(randomUserService.GetRandomUserData(user2));
             await AddNewUserDataAsync(randomUserService.GetRandomUserData(user2));
 
-            await AddNewUserDataAsync(randomUserService.GetRandomUserData(user3));
+            var randomUser3Data = randomUserService.GetRandomUserData(user3);
+            randomUser3Data.CreatedDate = DateTime.Now.Date.AddDays(NumberOfDaysForUserDataActiveStatus);
+            await AddNewUserDataAsync(randomUser3Data);
 
             var randomUser4Data = randomUserService.GetRandomUserData(user4);
-            randomUser4Data.CreatedDate = DateTime.Now.Date.AddDays(-NumberOfDaysForUserDataActiveStatus);
+            randomUser4Data.CreatedDate = DateTime.Now.Date.AddDays(-(NumberOfDaysForUserDataActiveStatus + 1));
             await AddNewUserDataAsync(randomUser4Data);
         }
 
